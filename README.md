@@ -49,7 +49,7 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
    ```
 2. Build the Docker image:
    ```bash
-   docker build --file ./paperless-nextcloud-sync.Dockerfile --tag paperless-nextcloud-sync .
+   docker build --file ./Dockerfile --tag paperless-nextcloud-sync .
    ```
 3. Add the container to your Paperless stack using Docker Compose:
    ```yaml
