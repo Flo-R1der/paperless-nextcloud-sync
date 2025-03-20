@@ -62,6 +62,7 @@ function container_exit() {
     sleep 3
   done
   wait
+  exit 0
 }
 trap "container_exit SIGTERM" SIGTERM
 trap "container_exit SIGINT" SIGINT
