@@ -5,11 +5,11 @@ This Docker image mounts a remote WebDAV source and synchronizes the data from `
 ## Why this Project?
 This project provides a seamless way to connect Paperless and Nextcloud, overcoming limitations found in other solutions. It fulfills the following key requirements:
 
-- Easy and quick configuration.
-- Synchronization with remote Nextcloud instances.
-- Files created, deleted, or modified appear in Nextcloud’s Activity Feed.
-- PDFs are searchable within Nextcloud.
-- Real-time synchronization.
+- **Easy and quick** configuration.
+- Synchronization with **remote Nextcloud instances**.
+- Files created, deleted, or modified appear in Nextcloud’s **Activity Feed**.
+- PDFs can be fund using the **search within Nextcloud**.
+- **Real-time synchronization**.
 
 Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperless’ data integrity.
 <details>
@@ -34,7 +34,8 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
    - Set log level **Info** - to view throttled events in the log.
    - Add the container’s IP to the whitelist in Nextcloud to prevent throttling during initial synchronization.
 
-> **NOTE**: Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
+> [!TIP]
+> Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
 
 <br>
 
@@ -62,19 +63,20 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
          - "/dev/fuse"
    ```
 2. Replace my placeholders and define environment variables:
-   - Under `volumes:` specify the mount-point of your document library
-   - Fill in the `WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD` values.
+   - Under `volumes:` specify the **mount-point of your document library**
+   - Fill in the **`WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD`** values.
 	   - Use app passwords if two-factor authentication is enabled 
 	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
-   - Optional: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
-   - Optional: set `LC_ALL` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+   - **Optional**: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
+   - **Optional**: set `LC_ALL` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
 3. Restart your Paperless instance to activate the container.
 4. Verify the container is running:
    ```bash
    docker logs --follow <container-name>
    ```
 
-> **NOTE**: Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
+> [!TIP]
+> Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
 
 ### Container Start
 - The WebDAV drive will be mounted.

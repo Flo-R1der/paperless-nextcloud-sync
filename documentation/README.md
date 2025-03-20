@@ -35,9 +35,11 @@ To achieve these goals, approaches like directly mounting the export directory t
 </details>
 <br>
 
-> **Note**: Synchronization works in only one direction: **Paperless ➜ Nextcloud**. Since Paperless manages the data, any modifications to the export directory by Nextcloud could corrupt the Paperless instance.
+> [!IMPORTANT]  
+> Synchronization works in only one direction: **Paperless ➜ Nextcloud**. Since Paperless manages the data, any modifications to the export directory by Nextcloud could corrupt the Paperless instance.
 
-> **INFO**: You are interested how I upload my Scans from my network-scanner or mobile device (even remotely), you can also take a look into my [short summary for pdf upload](readme_ftp-upload.md).
+> [!TIP]
+> You are interested how I upload my Scans from my network-scanner or mobile device (even remotely), you can also take a look into my [short summary for pdf upload](readme_ftp-upload.md).
 
 <br>
 
@@ -69,7 +71,8 @@ During the initial synchronization, depending on the number of files being trans
 
     ![](nc-logs_ip-address-throttled.png)
     ![](nc-settings_bruteforce-whitelist.png)
-    > **Note**: By whitelisting `172.0.0.0/8`, all IP addresses starting with `172.*` are included. These are typical Docker IP addresses. If you are using a public instance, consider the possibility of dynamic IP address changes. To calculate IP address masks accurately, an [IP Calculator](https://jodies.de/ipcalc) is recommended.
+    > [!NOTE]  
+    > By whitelisting `172.0.0.0/8`, all IP addresses starting with `172.*` are included. These are typical Docker IP addresses. If you are using a public instance, consider the possibility of dynamic IP address changes. To calculate IP address masks accurately, an [IP Calculator](https://jodies.de/ipcalc) is recommended.
     </details>
 
 <br>
@@ -95,16 +98,17 @@ During the initial synchronization, depending on the number of files being trans
             devices:
               - "/dev/fuse"
         ```
-        > **Note**: `privileged: true` and `devices: "/dev/fuse"` are mandatory for WebDAV mounts.
+        > [!IMPORTANT]  
+        > `privileged: true` and `devices: "/dev/fuse"` are mandatory for WebDAV mounts.
 
 2. Replace my placeholders and define environment variables:
-    - Under `volumes:` specify the mount-point of your document library
+    - Under `volumes:` specify the **mount-point of your document library**
     - Fill in the `WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD` values.
         - **Video**: [How to find WebDAV url in Nextcloud](https://www.youtube.com/watch?v=D1JU9vogekU)
         - **Video**: [How to create an app password in Nextcloud](https://www.youtube.com/watch?v=HQZyzlo82G4) - This is mandatory, if **Two-Factor-Authentication** is enabled for the Account you want to use! Otherwise, you can use the usual account password.
-        - Optional: Use the environment variable `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD` if you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/).
-    - Optional: Define mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`. This can be useful if you also want the WebDAV drive mapped to a mount point on the Docker host.
-    - The image is build with `LC_ALL=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
+        - **Optional**: Use the environment variable `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD` if you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/).
+    - **Optional**: Define mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`. This can be useful if you also want the WebDAV drive mapped to a mount point on the Docker host.
+    - **Optional**: The image is build with `LC_ALL=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
 
 
 3. Restart the Paperless instance to activate the container.
@@ -134,7 +138,8 @@ On the first run, always inspect the container logs. The logs should include the
 
     - Sets a `trap` to unmount the drive properly when a stop signal is received.
     - Initiates `sync.sh` for initial synchronization to update Nextcloud in the background.
-        > **Note**: While `rsync` could achieve similar results, it has caused file deletions during initial synchronization in my tests. My script avoids this issue, though some errors are still logged. Please share any better solutions!
+        > [!NOTE]  
+        > While `rsync` could achieve similar results, it has caused file deletions during initial synchronization in my tests. My script avoids this issue, though some errors are still logged. Please share any better solutions!
     - Configures the file watcher `inotifywait` to monitor changes by Paperless:
         - **CREATE**: Copies new files/folders from Paperless to Nextcloud.
         - **MODIFY**: Updates files in Nextcloud, creating new document versions (e.g., rotated pages, new OCR runs, etc.).
