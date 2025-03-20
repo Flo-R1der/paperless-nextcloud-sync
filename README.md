@@ -43,19 +43,12 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 ## Installation and Setup
 
 ### Steps
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Flo-R1der/paperless-nextcloud-sync.git
-   ```
-2. Build the Docker image:
-   ```bash
-   docker build --file ./Dockerfile --tag paperless-nextcloud-sync .
-   ```
-3. Add the container to your Paperless stack using Docker Compose:
+
+1. Add the container to your Paperless stack using Docker Compose:
    ```yaml
    services:
      nc-sync:
-       image: paperless-nextcloud-sync
+       image: flor1der/paperless-nextcloud-sync:latest
        volumes:
          - "/mnt/data/paperless_data/Document_Library/documents/archive:/mnt/source:ro"
          - "./nc-sync_logs/:/var/log/"
@@ -68,14 +61,15 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
        devices:
          - "/dev/fuse"
    ```
+2. Replace my placeholders and define environment variables:
+   - Under `volumes:` specify the mount-point of your document library
    - Fill in the `WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD` values.
-   - Use app passwords if two-factor authentication is enabled 
-   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
+	   - Use app passwords if two-factor authentication is enabled 
+	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
    - Optional: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
    - Optional: set `LC_ALL` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
-
-4. Restart your Paperless instance to activate the container.
-5. Verify the container is running:
+3. Restart your Paperless instance to activate the container.
+4. Verify the container is running:
    ```bash
    docker logs --follow <container-name>
    ```
@@ -99,7 +93,6 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 
 ## Open Topics
 - [ ] Replace initial synchronization with a better solution. My tests with `rsync` caused file deletions during synchronization, which my script avoids but still produces error messages (see [log example](documentation/container-logs_example.txt), lines 20-24). **Please open issues only if you have a suitable solution!**
-- [ ] Publish Docker image on GHCR and Docker Hub.
 
 <br>
 
