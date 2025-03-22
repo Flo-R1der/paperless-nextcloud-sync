@@ -28,10 +28,10 @@ function find_different_directories () {
     while read -r src_dir; do
         dst_dir="${2}${src_dir#$1}"
 
-        if [[ ! -f $3 ]]; then touch $3; fi
+        if [[ ! -f "$3" ]]; then touch "$3"; fi
 
         if [ ! -d "$dst_dir" ]; then 
-            echo "${src_dir/$1}" | cut -c2- >> $3
+            echo "${src_dir/$1}" | cut -c2- >> "$3"
         fi
     done
 }
@@ -56,17 +56,17 @@ function find_differences_in_directories () {
             dst_mtime=$(stat -c%Y "$dst_file")
         fi
 
-        if [[ ! -f $3 ]]; then touch $3; fi
+        if [[ ! -f "$3" ]]; then touch "$3"; fi
 
         if [[ $4 == "newer" ]]; then
             if (( $src_size != $dst_size )) || (( $src_mtime > $dst_mtime )); then
-                echo "${src_file/$1}" | cut -c2- >> $3; fi
+                echo "${src_file/$1}" | cut -c2- >> "$3"; fi
         elif [[ $4 == "older" ]]; then
             if (( $src_size != $dst_size )) || (( $src_mtime < $dst_mtime )); then
-                echo "${src_file/$1}" | cut -c2- >> $3; fi
+                echo "${src_file/$1}" | cut -c2- >> "$3"; fi
         else
             if (( $src_size != $dst_size )) || (( $src_mtime != $dst_mtime )); then
-                echo "${src_file/$1}" | cut -c2- >> $3; fi
+                echo "${src_file/$1}" | cut -c2- >> "$3"; fi
         fi
     done
 }
@@ -75,7 +75,7 @@ function find_differences_in_directories () {
 
 
 # determine directories to be created, and create them in webdrive if necessary
-find_different_directories $SOURCE_DIR $WEBDRIVE_DIR $DIRECTORY_CREATION_LIST
+find_different_directories "$SOURCE_DIR" "$WEBDRIVE_DIR" "$DIRECTORY_CREATION_LIST"
 
 if (( $(stat -c%s "$DIRECTORY_CREATION_LIST") == 0 )); then
     echo "no directory to create" >> "$Logfile"
@@ -84,13 +84,13 @@ else
 fi
 
 IFS=$'\n'
-for DIRECTORY in $(cat $DIRECTORY_CREATION_LIST); do
+for DIRECTORY in $(cat "$DIRECTORY_CREATION_LIST"); do
     mkdir "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
 done
 
 
 # determine files to be copied, and copy them to webdrive if necessary
-find_differences_in_directories $SOURCE_DIR $WEBDRIVE_DIR $COPY_LIST newer
+find_differences_in_directories "$SOURCE_DIR" "$WEBDRIVE_DIR" "$COPY_LIST" newer
 
 if (( $(stat -c%s "$COPY_LIST") == 0 )); then
     echo "no file to copy" >> "$Logfile"
@@ -99,13 +99,13 @@ else
 fi
 
 IFS=$'\n'
-for FILE in $(cat $COPY_LIST); do
+for FILE in $(cat "$COPY_LIST"); do
     cp "$SOURCE_DIR/$FILE" "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
 done
 
 
 # determine files to be deleted, and delete them in webdrive if necessary
-find_differences_in_directories $WEBDRIVE_DIR $SOURCE_DIR $DELETE_LIST older
+find_differences_in_directories "$WEBDRIVE_DIR" "$SOURCE_DIR" "$DELETE_LIST" older
 
 if (( $(stat -c%s "$DELETE_LIST") == 0 )); then
     echo "no file to remove" >> "$Logfile"
@@ -114,15 +114,15 @@ else
 fi
 
 IFS=$'\n'
-for FILE in $(cat $DELETE_LIST); do
-    if [[ ! $(cat $COPY_LIST) =~ $FILE ]]; then
+for FILE in $(cat "$DELETE_LIST"); do
+    if [[ ! $(cat "$COPY_LIST") =~ $FILE ]]; then
         rm "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
     fi
 done
 
 
 # determine directory to be deleted, and delete them in webdrive if necessary
-find_different_directories $WEBDRIVE_DIR $SOURCE_DIR $DIRECTORY_DELETATION_LIST
+find_different_directories "$WEBDRIVE_DIR" "$SOURCE_DIR" "$DIRECTORY_DELETATION_LIST"
 
 if (( $(stat -c%s "$DIRECTORY_DELETATION_LIST") == 0 )); then
     echo "no directory to remove" >> "$Logfile"
@@ -131,8 +131,8 @@ else
 fi
 
 IFS=$'\n'
-for DIRECTORY in $(cat $DIRECTORY_DELETATION_LIST); do
-    if [[ ! $(cat $DIRECTORY_CREATION_LIST) =~ $DIRECTORY ]]; then
+for DIRECTORY in $(cat "$DIRECTORY_DELETATION_LIST"); do
+    if [[ ! $(cat "$DIRECTORY_CREATION_LIST") =~ "$DIRECTORY" ]]; then
         rm -d "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
     fi
 done
@@ -140,10 +140,10 @@ done
 
 
 # cleanup
-rm $DIRECTORY_CREATION_LIST
-rm $DIRECTORY_DELETATION_LIST
-rm $COPY_LIST
-rm $DELETE_LIST
+rm "$DIRECTORY_CREATION_LIST"
+rm "$DIRECTORY_DELETATION_LIST"
+rm "$COPY_LIST"
+rm "$DELETE_LIST"
 
 
 
