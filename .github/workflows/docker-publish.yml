@@ -10,8 +10,11 @@ on:
   #     - main
   #     - master
   workflow_dispatch:
-  # schedule:
-  #   - cron: "3 3 3 */3 *"
+  release:
+    types:
+      - published
+  schedule:
+    - cron: "3 3 3 */3 *"
 
 jobs:
   build-and-push:
