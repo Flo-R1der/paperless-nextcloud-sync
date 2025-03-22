@@ -35,7 +35,7 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
    - Add the container’s IP to the whitelist in Nextcloud to prevent throttling during initial synchronization.
 
 > [!TIP]
-> Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
+> Are you struggling with this short description? <a href="https://github.com/Flo-R1der/paperless-nextcloud-sync/blob/main/documentation/README.md">Read the full documentation</a>.
 
 <br>
 
@@ -62,6 +62,7 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
        devices:
          - "/dev/fuse"
    ```
+
 2. Replace my placeholders and define environment variables:
    - Under `volumes:` specify the **mount-point of your document library**
    - Fill in the **`WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD`** values.
@@ -69,14 +70,16 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
    - **Optional**: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
    - **Optional**: set `LC_ALL` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+
 3. Restart your Paperless instance to activate the container.
+
 4. Verify the container is running:
    ```bash
    docker logs --follow <container-name>
    ```
 
 > [!TIP]
-> Are you struggling with this short description? [Read the full documentation.](documentation/README.md)
+> Are you struggling with this short description? <a href="https://github.com/Flo-R1der/paperless-nextcloud-sync/blob/main/documentation/README.md">Read the full documentation</a>.
 
 ### Container Start
 - The WebDAV drive will be mounted.
@@ -88,7 +91,7 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 
 ### Expected Results
 - Initial synchronization uploads existing files, that are not existing in Nextcloud, newer in Paperless or moved/renamed.
-- New files in Paperless are transferred to Nextcloud and appear in the Activity Feed:
+- New files in Paperless are transferred to Nextcloud and appear in the Activity Feed:  
 ![Nextcloud's Activity Feed](documentation/nextcloud-activity_example.png)
 
 <br>
