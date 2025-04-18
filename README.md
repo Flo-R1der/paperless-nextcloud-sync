@@ -11,7 +11,35 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 - PDFs can be fund using the **search within Nextcloud**.
 - **Real-time synchronization**.
 
-Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperless’ data integrity.
+<details>
+<summary>Here's a comparison between the data exchange options for Paperless and Nextcloud:</summary>
+
+|                                         | Nextcloud <br>Paperless App | Local Mount | SFTP or <br>SMB/CIFS ¹ | This Container  |
+| --------------------------------------- | --------------------------- | ----------- | ---------------------- | --------------- |
+| Easy SetUp                              | ✅                          | ✅          | ✅                     | ✅ ²            |
+| Paperless Files available in Nextcloud  | ❌                          | ✅          | ✅                     | ✅              |
+| Send files to Paperless consume (File input) | ✅ ³                   | ☑️ ⁴        | ☑️ ⁴                   | ❌ ³            |
+| Services on another Host (same Network) | ✅                          | ❌          | ✅                     | ✅              |
+| remote Services                         | ✅                          | ❌          | ☑️ ⁵                   | ✅              |
+| Files available in the Nextcloud Search | ❌ ³                        | ❌          | ❌                     | ✅              |
+| Recent Paperless-changes available in Nextcloud Activity App | ❌ ³   | ❌          | ❌                     | ✅              |
+| Paperless Files backed up in Nextcloud ⁶ | ❌ ³                       | ❌          | ❌                     | ✅ ⁶            |
+| Works with both: Docker and Bare-Metal  | ✅                          | ✅ ⁷        | ✅ ⁷                   | ✖️ ⁸            |
+
+¹ Additional FTP or SMB/CIFS service required  
+² see prerequisites  
+³ Nextcloud Paperless App: Nextcloud → Paperless / this container: Paperless → Nextcloud  
+⁴ a second external mount with writing permission required  
+⁵ only SFTP (SMB/CIFS not recommended over the Internet!)  
+⁶ this does NOT replace a regular backup including the Paperless Database   
+⁷ for Docker: ensure correct mounting  
+⁸ untested. Probably won't work OOTB and requires a more complex set-up  
+
+</details>
+
+> [!NOTE]  
+> Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperless’ data integrity.
+
 <details>
 <summary>Click here to see a graphical overview of the container's functionality:</summary>
 
