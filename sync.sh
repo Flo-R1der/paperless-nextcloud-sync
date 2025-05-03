@@ -48,10 +48,14 @@ function find_differences_in_directories () {
     while read -r src_file; do
         dst_file="${2}${src_file#$1}"
 
+        src_size=0
+        src_mtime=0
         src_size=$(stat -c%s "$src_file")
         src_mtime=$(stat -c%Y "$src_file")
 
         if [ -f "$dst_file" ]; then
+            dst_size=0
+            dst_mtime=0
             dst_size=$(stat -c%s "$dst_file")
             dst_mtime=$(stat -c%Y "$dst_file")
         fi

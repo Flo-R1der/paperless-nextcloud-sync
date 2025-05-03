@@ -4,23 +4,26 @@
 if [[ $LC_ALL != "en_US.UTF-8" ]]; then
   locale-gen "${LC_ALL}"
 fi
+if [[ $LANG != "en_US.UTF-8" ]]; then
+  update-locale LANG="$LANG"
+fi
 
 # Check mandatory variables and store them to secrets file
-if [ -z ${WEBDRIVE_USER} ]; then
-  echo "[ERROR] Webdrive user is not set!"
+if [[ -z "${WEBDRIVE_USER}" ]]; then
+  echo "[ERROR] WEBDRIVE_USER is not set!"
   exit 1
 fi
 
-if [ -n "${WEBDRIVE_PASSWORD_FILE}" ]; then
-    WEBDRIVE_PASSWORD=$(read ${WEBDRIVE_PASSWORD_FILE})
+if [[ -n "${WEBDRIVE_PASSWORD_FILE}" ]]; then
+    WEBDRIVE_PASSWORD=$(read "${WEBDRIVE_PASSWORD_FILE}")
 fi
-if [ -z ${WEBDRIVE_PASSWORD} ]; then
-  echo "[ERROR] Webdrive password is not set!"
+if [[ -z "${WEBDRIVE_PASSWORD}" ]]; then
+  echo "[ERROR] WEBDRIVE_PASSWORD is not set!"
     exit 1
 fi
 
-if [ -z ${WEBDRIVE_URL} ]; then
-  echo "[ERROR] Webdrive url is not set!"
+if [[ -z "${WEBDRIVE_URL}" ]]; then
+  echo "[ERROR] WEBDRIVE_URL is not set!"
   exit 1
 fi
 
@@ -80,7 +83,7 @@ echo "==========================================================================
 
 # setting up file watcher and actions for for high-performance instant synchronization per-event
 # supports renaming and file-move, to preserve existing files in Nextcloud (instead of delete+recreate)
-inotifywait -m -r -e modify,create,delete,move "$SOURCE_DIR" --format '%e|%w%f|%f' |
+inotifywait -m -r -e modify,create,delete,move --exclude '.*\.swp|.*\.tmp' "$SOURCE_DIR" --format '%e|%w%f' |
 while IFS='|' read -r event full_path filename; do
   RELATIVE_PATH="${full_path/${SOURCE_DIR}\//''}"
   case "$event" in
@@ -131,4 +134,5 @@ while IFS='|' read -r event full_path filename; do
   esac
   unset RELATIVE_PATH
 done &
+
 wait
