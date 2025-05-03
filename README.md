@@ -12,7 +12,7 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 - **Real-time synchronization**.
 
 > [!NOTE]  
-> Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperless’ data integrity.
+> Synchronization is unidirectional (<b>Paperless ➔ Nextcloud</b>) to ensure Paperless’ data integrity.
 
 <details>
 <summary>Click here to see a graphical overview of the container's functionality:</summary>
@@ -57,7 +57,7 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 
 ### Adjustments in Nextcloud
 1. **Create a Dedicated Account**
-   - Also create a folder for synchronization adn to share across your nextcloud.
+   - Also **create a dedicated folder** for synchronization and sharing across your nextcloud.
    - Then share the folder as **read-only** with users/groups to maintain data consistency.
 2. **Brute-Force Settings**
    - Set log level **Info** - to view throttled events in the log.
