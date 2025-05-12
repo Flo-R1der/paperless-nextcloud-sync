@@ -51,6 +51,8 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 
 ## Preparation
 
+You may configure the [Paperless File name handling](https://docs.paperless-ngx.com/advanced_usage/#file-name-handling) first.
+
 ### Requirements
 - Administrative access to Nextcloud for adjusting user and brute-force settings.
 - Dedicated Nextcloud account with read-write permissions for the synchronization container.
