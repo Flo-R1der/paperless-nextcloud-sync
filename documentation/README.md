@@ -20,11 +20,11 @@ The synchronization process is intended to be real-time and seamless. Once the W
 ## Why this Project?
 I was looking for a seamless way to connect Paperless and Nextcloud. During my research, I tested several existing solutions, but they all had drawbacks that I found unacceptable. This project aims to meet the following **requirements**:
 
-- Easy to configure and ready to use within minutes.
-- Supports synchronization with remote Nextcloud instances.
-- Created, deleted, or modified files should appear in Nextcloud's Activity Feed.
-- PDFs should be searchable within Nextcloud.
-- Changes should be synchronized as soon as possible.
+- **Easy to configure** and ready to use within minutes.
+- Supports synchronization with **remote Nextcloud instances**.
+- Created, deleted, or modified files should appear in **Nextcloud's Activity Feed**.
+- PDFs should be **searchable within Nextcloud**.
+- Changes should be **synchronized as soon as possible**.
 
 To achieve these goals, approaches like directly mounting the export directory to Nextcloud or connecting a Paperless stack to an FTP server proved unsuitable. As a result, I developed this custom Docker container. It uses WebDAV mounts to synchronize files and folders based on events.
 
@@ -33,6 +33,32 @@ To achieve these goals, approaches like directly mounting the export directory t
 
 ![](my-setup_diagram-1.drawio.svg)
 </details>
+
+<details>
+<summary>Here's a comparison between the data exchange options for Paperless and Nextcloud:</summary>
+
+|                                         | Nextcloud <br>Paperless App | Local Mount | SFTP or <br>SMB/CIFS ¹ | This Container  |
+| --------------------------------------- | --------------------------- | ----------- | ---------------------- | --------------- |
+| Easy SetUp                              | ✅                          | ✅          | ✅                     | ✅ ²            |
+| Paperless Files available in Nextcloud  | ❌                          | ✅          | ✅                     | ✅              |
+| Send files to Paperless consume (File input) | ✅ ³                   | ☑️ ⁴        | ☑️ ⁴                   | ❌ ³            |
+| Services on another Host (same Network) | ✅                          | ❌          | ✅                     | ✅              |
+| remote Services                         | ✅                          | ❌          | ☑️ ⁵                   | ✅              |
+| Files available in the Nextcloud Search | ❌ ³                        | ❌          | ❌                     | ✅              |
+| Recent Paperless-changes available in Nextcloud Activity App | ❌ ³   | ❌          | ❌                     | ✅              |
+| Paperless Files backed up in Nextcloud ⁶ | ❌ ³                       | ❌          | ❌                     | ✅ ⁶            |
+| Works with both: Docker and Bare-Metal  | ✅                          | ✅ ⁷        | ✅ ⁷                   | ✖️ ⁸            |
+
+¹ Additional FTP or SMB/CIFS service required  
+² see prerequisites  
+³ Nextcloud Paperless App: Nextcloud → Paperless / this container: Paperless → Nextcloud  
+⁴ a second external mount with writing permission required  
+⁵ only SFTP (SMB/CIFS not recommended over the Internet!)  
+⁶ this does NOT replace a regular backup including the Paperless Database   
+⁷ for Docker: ensure correct mounting  
+⁸ untested. Probably won't work OOTB and requires a more complex set-up  
+</details>
+
 <br>
 
 > [!IMPORTANT]  
@@ -45,8 +71,10 @@ To achieve these goals, approaches like directly mounting the export directory t
 
 ## Preparation
 
+You may configure the [Paperless File name handling](https://docs.paperless-ngx.com/advanced_usage/#file-name-handling) first. The PDF files in Paperless are named based on their internal ID which didn't tell much when transferred to Nextcloud.
+
 ### User and Share Settings
-For WebDAV synchronization, it is recommended to use a **dedicated account**, if possible. This account should be linked to the synchronization container with (effectively with read-write permissions) and configured to share the synchronized files with other users or groups with **read-only permissions**. This ensures that no changes are made to the PDF files and makes it easier to trace which files are controlled by Paperless.  
+For WebDAV synchronization, it is recommended to use a **dedicated account**, if possible. This account should be linked to the synchronization container (effectively with read-write permissions) and configured to share the synchronized folder/files with other users or groups with **read-only permissions**. This ensures that no changes are made to the PDF files and makes it easier to trace which files are controlled by Paperless.  
 To create a new user, log in as an administrator, navigate to the User Administration, and follow [the official guide](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/user_configuration.html#creating-a-new-user).
 
 <details>
@@ -81,13 +109,10 @@ During the initial synchronization, depending on the number of files being trans
 1. Add the container to your Paperless instance, preferably via **[Docker Compose](https://docs.docker.com/compose/)** or **[Portainer Stack](https://docs.portainer.io/user/docker/stacks/edit)**.
     - You can use and edit the following block:
         ```yaml
-        version: "3"
-
-        services:
           nc-sync:
             image: paperless-nextcloud-sync
             volumes:
-              - "/mnt/data/paperless_data/Document_Library/documents/archive:/mnt/source:ro"
+              - "/var/lib/docker/volumes/paperless_media/_data/documents/archive:/mnt/source:ro"
             environment:
               WEBDRIVE_URL: $NEXTCLOUD_URL
               WEBDRIVE_USER: $NEXTCLOUD_USER
@@ -108,7 +133,7 @@ During the initial synchronization, depending on the number of files being trans
         - **Video**: [How to create an app password in Nextcloud](https://www.youtube.com/watch?v=HQZyzlo82G4) - This is mandatory, if **Two-Factor-Authentication** is enabled for the Account you want to use! Otherwise, you can use the usual account password.
         - **Optional**: Use the environment variable `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD` if you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/).
     - **Optional**: Define mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`. This can be useful if you also want the WebDAV drive mapped to a mount point on the Docker host.
-    - **Optional**: The image is build with `LC_ALL=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
+    - **Optional**: The image is build with `LC_ALL=en_US.UTF-8` and `LANG=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
 
 
 3. Restart the Paperless instance to activate the container.
