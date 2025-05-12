@@ -28,8 +28,6 @@ function find_different_directories () {
     while read -r src_dir; do
         dst_dir="${2}${src_dir#$1}"
 
-        if [[ ! -f "$3" ]]; then touch "$3"; fi
-
         if [ ! -d "$dst_dir" ]; then 
             echo "${src_dir/$1}" | cut -c2- >> "$3"
         fi
@@ -54,9 +52,10 @@ function find_differences_in_directories () {
         if [ -f "$dst_file" ]; then
             dst_size=$(stat -c%s "$dst_file")
             dst_mtime=$(stat -c%Y "$dst_file")
+        else
+            dst_size=0
+            dst_mtime=0
         fi
-
-        if [[ ! -f "$3" ]]; then touch "$3"; fi
 
         if [[ $4 == "newer" ]]; then
             if (( $src_size != $dst_size )) || (( $src_mtime > $dst_mtime )); then
@@ -75,67 +74,71 @@ function find_differences_in_directories () {
 
 
 # determine directories to be created, and create them in webdrive if necessary
+touch "$DIRECTORY_CREATION_LIST"
 find_different_directories "$SOURCE_DIR" "$WEBDRIVE_DIR" "$DIRECTORY_CREATION_LIST"
 
 if (( $(stat -c%s "$DIRECTORY_CREATION_LIST") == 0 )); then
     echo "no directory to create" >> "$Logfile"
 else
     echo "Folder creation:" >> "$Logfile"
-fi
 
-IFS=$'\n'
-for DIRECTORY in $(cat "$DIRECTORY_CREATION_LIST"); do
-    mkdir "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
-done
+    IFS=$'\n'
+    for DIRECTORY in $(cat "$DIRECTORY_CREATION_LIST"); do
+        mkdir "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
+    done
+fi
 
 
 # determine files to be copied, and copy them to webdrive if necessary
+touch "$COPY_LIST"
 find_differences_in_directories "$SOURCE_DIR" "$WEBDRIVE_DIR" "$COPY_LIST" newer
 
 if (( $(stat -c%s "$COPY_LIST") == 0 )); then
     echo "no file to copy" >> "$Logfile"
 else
     echo "File copy:" >> "$Logfile"
-fi
 
-IFS=$'\n'
-for FILE in $(cat "$COPY_LIST"); do
-    cp "$SOURCE_DIR/$FILE" "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
-done
+    IFS=$'\n'
+    for FILE in $(cat "$COPY_LIST"); do
+        cp "$SOURCE_DIR/$FILE" "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
+    done
+fi
 
 
 # determine files to be deleted, and delete them in webdrive if necessary
+touch "$DELETE_LIST"
 find_differences_in_directories "$WEBDRIVE_DIR" "$SOURCE_DIR" "$DELETE_LIST" older
 
 if (( $(stat -c%s "$DELETE_LIST") == 0 )); then
     echo "no file to remove" >> "$Logfile"
 else
     echo "File removal:" >> "$Logfile"
-fi
 
-IFS=$'\n'
-for FILE in $(cat "$DELETE_LIST"); do
-    if [[ ! $(cat "$COPY_LIST") =~ $FILE ]]; then
-        rm "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
-    fi
-done
+    IFS=$'\n'
+    for FILE in $(cat "$DELETE_LIST"); do
+        if [[ ! $(cat "$COPY_LIST") =~ $FILE ]]; then
+            rm "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
+        fi
+    done
+fi
 
 
 # determine directory to be deleted, and delete them in webdrive if necessary
+touch "$DIRECTORY_DELETATION_LIST"
 find_different_directories "$WEBDRIVE_DIR" "$SOURCE_DIR" "$DIRECTORY_DELETATION_LIST"
 
 if (( $(stat -c%s "$DIRECTORY_DELETATION_LIST") == 0 )); then
     echo "no directory to remove" >> "$Logfile"
 else
     echo "Folder removal:" >> "$Logfile"
-fi
 
-IFS=$'\n'
-for DIRECTORY in $(cat "$DIRECTORY_DELETATION_LIST"); do
-    if [[ ! $(cat "$DIRECTORY_CREATION_LIST") =~ "$DIRECTORY" ]]; then
-        rm -d "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
-    fi
-done
+    IFS=$'\n'
+    for DIRECTORY in $(cat "$DIRECTORY_DELETATION_LIST"); do
+        if [[ ! $(cat "$DIRECTORY_CREATION_LIST") =~ "$DIRECTORY" ]]; then
+            rm -d "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
+        fi
+    done
+fi
 
 
 

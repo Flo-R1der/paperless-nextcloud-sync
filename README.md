@@ -11,17 +11,47 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 - PDFs can be fund using the **search within Nextcloud**.
 - **Real-time synchronization**.
 
-Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperless’ data integrity.
+> [!NOTE]  
+> Synchronization is unidirectional (<b>Paperless ➔ Nextcloud</b>) to ensure Paperless’ data integrity.
+
 <details>
 <summary>Click here to see a graphical overview of the container's functionality:</summary>
 
 ![](documentation/my-setup_diagram-1.drawio.svg)
 </details>
+
+<details>
+<summary>Here's a comparison between the data exchange options for Paperless and Nextcloud:</summary>
+
+|                                         | Nextcloud <br>Paperless App | Local Mount | SFTP or <br>SMB/CIFS ¹ | This Container  |
+| --------------------------------------- | --------------------------- | ----------- | ---------------------- | --------------- |
+| Easy SetUp                              | ✅                          | ✅          | ✅                     | ✅ ²            |
+| Paperless Files available in Nextcloud  | ❌                          | ✅          | ✅                     | ✅              |
+| Send files to Paperless consume (File input) | ✅ ³                   | ☑️ ⁴        | ☑️ ⁴                   | ❌ ³            |
+| Services on another Host (same Network) | ✅                          | ❌          | ✅                     | ✅              |
+| remote Services                         | ✅                          | ❌          | ☑️ ⁵                   | ✅              |
+| Files available in the Nextcloud Search | ❌ ³                        | ❌          | ❌                     | ✅              |
+| Recent Paperless-changes available in Nextcloud Activity App | ❌ ³   | ❌          | ❌                     | ✅              |
+| Paperless Files backed up in Nextcloud ⁶ | ❌ ³                       | ❌          | ❌                     | ✅ ⁶            |
+| Works with both: Docker and Bare-Metal  | ✅                          | ✅ ⁷        | ✅ ⁷                   | ✖️ ⁸            |
+
+¹ Additional FTP or SMB/CIFS service required  
+² see prerequisites  
+³ Nextcloud Paperless App: Nextcloud → Paperless / this container: Paperless → Nextcloud  
+⁴ a second external mount with writing permission required  
+⁵ only SFTP (SMB/CIFS not recommended over the Internet!)  
+⁶ this does NOT replace a regular backup including the Paperless Database   
+⁷ for Docker: ensure correct mounting  
+⁸ untested. Probably won't work OOTB and requires a more complex set-up  
+</details>
+
 <br>
 
 ---
 
 ## Preparation
+
+You may configure the [Paperless File name handling](https://docs.paperless-ngx.com/advanced_usage/#file-name-handling) first.
 
 ### Requirements
 - Administrative access to Nextcloud for adjusting user and brute-force settings.
@@ -29,7 +59,8 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 
 ### Adjustments in Nextcloud
 1. **Create a Dedicated Account**
-   - Then share the synchronized files as **read-only** with users/groups to maintain data consistency.
+   - Also **create a dedicated folder** for synchronization and sharing across your nextcloud.
+   - Then share the folder as **read-only** with users/groups to maintain data consistency.
 2. **Brute-Force Settings**
    - Set log level **Info** - to view throttled events in the log.
    - Add the container’s IP to the whitelist in Nextcloud to prevent throttling during initial synchronization.
@@ -47,11 +78,10 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 
 1. Add the container to your Paperless stack using Docker Compose:
    ```yaml
-   services:
      nc-sync:
        image: flor1der/paperless-nextcloud-sync:latest
        volumes:
-         - "/mnt/data/paperless_data/Document_Library/documents/archive:/mnt/source:ro"
+         - "/var/lib/docker/volumes/paperless_media/_data/documents/archive:/mnt/source:ro"
          - "./nc-sync_logs/:/var/log/"
        environment:
          WEBDRIVE_URL: $NEXTCLOUD_URL
@@ -66,10 +96,11 @@ Synchronization is unidirectional (**Paperless ➔ Nextcloud**) to ensure Paperl
 2. Replace my placeholders and define environment variables:
    - Under `volumes:` specify the **mount-point of your document library**
    - Fill in the **`WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD`** values.
-	   - Use app passwords if two-factor authentication is enabled 
+	   - The `WEBDRIVE_URL` must be the **WebDAV-URL of the folder** created under [Preperation](#preparation)
+      - Use app passwords if two-factor authentication is enabled 
 	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
    - **Optional**: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
-   - **Optional**: set `LC_ALL` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+   - **Optional**: set `LC_ALL` and `LANG` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
 
 3. Restart your Paperless instance to activate the container.
 
