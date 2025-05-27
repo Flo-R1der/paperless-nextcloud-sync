@@ -27,7 +27,7 @@ if [[ -z "${WEBDRIVE_URL}" ]]; then
   exit 1
 fi
 
-echo "$WEBDRIVE_URL $WEBDRIVE_USER $WEBDRIVE_PASSWORD" > /etc/davfs2/secrets
+echo "\"$WEBDRIVE_URL\" \"$WEBDRIVE_USER\" \"$WEBDRIVE_PASSWORD\"" > /etc/davfs2/secrets
 
 # Set optional variables
 DIR_USER=${SYNC_USERID:-0}
