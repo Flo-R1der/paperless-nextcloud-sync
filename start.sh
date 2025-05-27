@@ -48,7 +48,7 @@ echo "[INFO] WEBDRIVE_USER: $WEBDRIVE_USER"
 if [ -f "/var/run/mount.davfs/mnt-webdrive.pid" ]; then
   rm /var/run/mount.davfs/mnt-webdrive.pid
 fi
-mount -t davfs "$WEBDRIVE_URL" /mnt/webdrive \
+mount -t davfs "$WEBDRIVE_URL" /mnt/webdrive -v \
   -o uid="$DIR_USER",gid="$DIR_GROUP",dir_mode="$ACCESS_DIR",file_mode="$ACCESS_FILE"
 if [ $? -ne 0 ]; then
   echo "[ERROR] Failed to mount $WEBDRIVE_URL"
