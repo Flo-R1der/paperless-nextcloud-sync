@@ -18,6 +18,7 @@ ENV LC_ALL=en_US.UTF-8
 RUN locale-gen "$LC_ALL" && \
     update-locale LANG="$LANG"
 
+COPY davfs2.conf /etc/davfs2/davfs2.conf
 COPY *.sh /
 
 ENTRYPOINT [ "tini", "-g", "--", "/start.sh" ]
