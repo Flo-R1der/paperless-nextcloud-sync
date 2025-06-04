@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage sync.sh: $1 = source | $2 = destination | "$3" = reason
+# usage sync_full.sh: $1 = source | $2 = destination | "$3" = reason
 
 
 # Variables
