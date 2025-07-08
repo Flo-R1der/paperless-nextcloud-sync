@@ -2,6 +2,9 @@
 
 # usage sync_live.sh: $1 = source | $2 = destination 
 
+SOURCE_DIR="$1"
+WEBDRIVE_DIR="$2"
+
 
 inotifywait -m -r -e modify,create,delete,move --exclude '.*\.swp|.*\.tmp' "$SOURCE_DIR" --format '%e|%w%f' |
 while IFS='|' read -r event full_path filename; do
