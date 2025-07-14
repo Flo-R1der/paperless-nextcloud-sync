@@ -1,6 +1,12 @@
 # Paperless-ngx to Nextcloud Real-Time Synchronization via WebDAV
 
-This Docker image mounts a remote WebDAV source and synchronizes the data from `/mnt/source` to the mounted WebDAV drive in real-time. It is specifically designed for Nextcloud but may also work with other cloud systems that use WebDAV.
+This Docker image mounts a remote WebDAV source and synchronizes the data from `/mnt/source` to the mounted WebDAV drive in real-time. It is designed for Nextcloud but also proven to work with other cloud systems:
+
+✔ Nextcloud (tested version 30.0)  
+✔ ownCloud (tested version 10.15)  
+✔ OpenCloud (tested version 2.3)  
+✔ web.de smartdrive (tested in 2025-05)  
+
 
 ## Why this Project?
 This project provides a seamless way to connect Paperless and Nextcloud, overcoming limitations found in other solutions. It fulfills the following key requirements:
