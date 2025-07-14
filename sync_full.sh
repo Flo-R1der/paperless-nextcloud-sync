@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# usage sync.sh: $1 = source | $2 = destination | "$3" = reason
+# usage sync_full.sh: $1 = source | $2 = destination | "$3" = reason
 
 
 # Variables
@@ -84,7 +84,7 @@ else
 
     IFS=$'\n'
     for DIRECTORY in $(cat "$DIRECTORY_CREATION_LIST"); do
-        mkdir "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
+        mkdir "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile" 2>&1
     done
 fi
 
@@ -100,7 +100,7 @@ else
 
     IFS=$'\n'
     for FILE in $(cat "$COPY_LIST"); do
-        cp "$SOURCE_DIR/$FILE" "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
+        cp "$SOURCE_DIR/$FILE" "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile" 2>&1
     done
 fi
 
@@ -117,7 +117,7 @@ else
     IFS=$'\n'
     for FILE in $(cat "$DELETE_LIST"); do
         if [[ ! $(cat "$COPY_LIST") =~ $FILE ]]; then
-            rm "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile"
+            rm "$WEBDRIVE_DIR/$FILE" --verbose >> "$Logfile" 2>&1
         fi
     done
 fi
@@ -135,7 +135,7 @@ else
     IFS=$'\n'
     for DIRECTORY in $(cat "$DIRECTORY_DELETATION_LIST"); do
         if [[ ! $(cat "$DIRECTORY_CREATION_LIST") =~ "$DIRECTORY" ]]; then
-            rm -d "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile"
+            rm -d "$WEBDRIVE_DIR/$DIRECTORY" --verbose >> "$Logfile" 2>&1
         fi
     done
 fi

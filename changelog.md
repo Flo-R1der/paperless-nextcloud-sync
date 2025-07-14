@@ -1,3 +1,22 @@
+# [1.1.0](https://github.com/Flo-R1der/paperless-nextcloud-sync/releases/tag/1.1.0)
+
+## Added
+- special characters for url/username/password supported
+- support for ownCloud (tested version 10.15)
+- support for OpenCloud (tested version 2.3)
+
+
+## Improvements
+- better verbosity and logging
+- externalize `sync_live.sh` as separate script
+
+## Documentation updates
+- supported cloud-systems with tested version
+
+
+<br>
+
+---
 # [1.0.1](https://github.com/Flo-R1der/paperless-nextcloud-sync/releases/tag/1.0.1)
 
 ## Improvements
