@@ -29,6 +29,12 @@ fi
 
 echo "\"$WEBDRIVE_URL\" \"$WEBDRIVE_USER\" \"$WEBDRIVE_PASSWORD\"" > /etc/davfs2/secrets
 
+# Initialize cron.log and start cron process
+touch /var/log/cron.log
+echo "" >> /var/log/cron.log    # empty log line
+echo "===== New Container Start: $(date +%Y-%m-%d) $(date +%H:%M:%S) =====" >> /var/log/cron.log
+exec cron &
+
 # Set optional variables
 DIR_USER=${SYNC_USERID:-0}
 DIR_GROUP=${SYNC_GROUPID:-0}

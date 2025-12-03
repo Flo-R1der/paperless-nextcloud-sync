@@ -1,0 +1,2 @@
+# see https://crontab.guru/#0_*/8_*_*_* for explanation and changes
+* * * * * root echo "I am alive... $(date)" >> /var/log/cron.log
