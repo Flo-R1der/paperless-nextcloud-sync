@@ -36,10 +36,10 @@ echo "===== New Container Start: $(date +%Y-%m-%d) $(date +%H:%M:%S) =====" >> /
 exec cron &
 
 # Set optional variables
-DIR_USER=${SYNC_USERID:-0}
-DIR_GROUP=${SYNC_GROUPID:-0}
-ACCESS_DIR=${SYNC_ACCESS_DIR:-755}
-ACCESS_FILE=${SYNC_ACCESS_FILE:-755}
+DIR_USER=${DIR_USER:-0}
+DIR_GROUP=${DIR_GROUP:-0}
+ACCESS_DIR=${ACCESS_DIR:-755}
+ACCESS_FILE=${ACCESS_FILE:-755}
 SOURCE_DIR="/mnt/source"
 WEBDRIVE_DIR="/mnt/webdrive"
 
@@ -84,12 +84,12 @@ echo "==========================================================================
 # start the initial synchronization as background job
 # this script prints output in container logs, when finished
 # usage sync_full.sh: $1 = source | $2 = destination | $3 = reason
-/bin/bash sync_full.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" "container-start" &
+bash sync_full.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" "container-start" &
 
 
 # setting up file watcher and actions for for high-performance instant synchronization per-event
 # supports renaming and file-move, to preserve existing files in Nextcloud (instead of delete+recreate)
-/bin/bash sync_live.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" &
+bash sync_live.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" &
 
 
 wait
