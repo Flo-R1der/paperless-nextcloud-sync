@@ -105,8 +105,15 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
 	   - The `WEBDRIVE_URL` must be the **WebDAV-URL of the folder** created under [Preperation](#preparation)
       - Use app passwords if two-factor authentication is enabled 
 	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
-   - **Optional**: Define webdrive mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
-   - **Optional**: set `LC_ALL` and `LANG` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+
+      <details>
+      <summary>Click here to see the <b>optional settings:</b></summary>
+
+      - Define webdrive mount options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
+      - Set `LC_ALL` and `LANG` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+      - Set the `KEEP_LOGFILE_DAYS` if the log files should be preserved for more/less than 90 days.
+
+      </details>
 
 3. Restart your Paperless instance to activate the container.
 
