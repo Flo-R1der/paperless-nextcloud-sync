@@ -1,2 +1,4 @@
 # see https://crontab.guru/#0_*/8_*_*_* for explanation and changes
-* * * * * root echo "I am alive... $(date)" >> /var/log/cron.log
+#* * * * * root echo "I am alive... $(date)" >> /var/log/cron.log
+#0 */8 * * * root /cron.sh full-sync
+1 */24 * * * root /cron.sh cleanup-logs
