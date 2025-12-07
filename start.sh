@@ -8,6 +8,16 @@ if [[ $LANG != "en_US.UTF-8" ]]; then
   update-locale LANG="$LANG"
 fi
 
+# Set timezone if TZ variable is set
+if [[ -n "${TZ}" ]]; then
+  echo "[INFO] setting up Time-Zone: ${TZ}"
+  ln -fs "/usr/share/zoneinfo/${TZ}" "/etc/localtime"
+  echo "symlink: /etc/localtime -> $(readlink -f /etc/localtime)"
+  dpkg-reconfigure -f noninteractive tzdata
+else
+  echo "[INFO] Time-Zone Variable '$TZ' not set. using UTC as default."
+fi
+
 # Check mandatory variables and store them to secrets file
 if [[ -z "${WEBDRIVE_USER}" ]]; then
   echo "[ERROR] WEBDRIVE_USER is not set!"

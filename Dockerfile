@@ -2,6 +2,7 @@ FROM ubuntu:latest
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+      tzdata \
       cron \
       davfs2 \
       ca-certificates \
