@@ -9,15 +9,22 @@
 exec >> /var/log/cron.log
 exec 2>&1
 
-# Variables
-SOURCE_DIR="/mnt/source"
-WEBDRIVE_DIR="/mnt/webdrive"
-KEEP_LOGFILE_DAYS=${KEEP_LOGFILE_DAYS:-90}
-
-# Functions
 function log () {
     echo "$(date +%Y-%m-%d) $(date +%H:%M:%S) $1"
 }
+
+# Set/Load environment variables
+SOURCE_DIR="/mnt/source"
+WEBDRIVE_DIR="/mnt/webdrive"
+
+ENV_FILE="/etc/default/env"
+if [ -f "$ENV_FILE" ]; then
+    source "$ENV_FILE"
+    log "[DEBUG] Sourced env file: ${ENV_FILE:-<none>}"
+    cat "$ENV_FILE"
+else
+    log "[INFO] No Environment File found in $ENV_FILE"
+fi
 
 
 # Working

@@ -53,6 +53,18 @@ ACCESS_FILE=${ACCESS_FILE:-755}
 SOURCE_DIR="/mnt/source"
 WEBDRIVE_DIR="/mnt/webdrive"
 
+# Persist runtime environment for cron and other helpers (do NOT store secrets!)
+ENV_FILE="/etc/default/env"
+cat > "$ENV_FILE" <<EOF
+SOURCE_DIR="${SOURCE_DIR}"
+WEBDRIVE_DIR="${WEBDRIVE_DIR}"
+WEBDRIVE_USER="${WEBDRIVE_USER}"
+WEBDRIVE_URL="${WEBDRIVE_URL}"
+KEEP_LOGFILE_DAYS=${KEEP_LOGFILE_DAYS:-90}
+EOF
+echo "[INFO] Wrote environment file $ENV_FILE"
+chmod 744 "$ENV_FILE"
+
 # Create user
 if [ $DIR_USER -gt 0 ]; then
   useradd webdrive -u $DIR_USER -N -G $DIR_GROUP
