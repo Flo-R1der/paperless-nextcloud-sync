@@ -2,6 +2,7 @@
 
 # Set local Variables for full UTF-8 support
 if [[ $LC_ALL != "en_US.UTF-8" ]]; then
+  echo "[ACTION] Generating Locale: ${LC_ALL}"
   locale-gen "${LC_ALL}"
 fi
 if [[ $LANG != "en_US.UTF-8" ]]; then
@@ -10,7 +11,7 @@ fi
 
 # Set timezone if TZ variable is set
 if [[ -n "${TZ}" ]]; then
-  echo "[INFO] setting up Time-Zone: ${TZ}"
+  echo "[ACTION] setting up Time-Zone: ${TZ}"
   ln -fs "/usr/share/zoneinfo/${TZ}" "/etc/localtime"
   echo "symlink: /etc/localtime -> $(readlink -f /etc/localtime)"
   dpkg-reconfigure -f noninteractive tzdata
@@ -62,8 +63,8 @@ WEBDRIVE_USER="${WEBDRIVE_USER}"
 WEBDRIVE_URL="${WEBDRIVE_URL}"
 KEEP_LOGFILE_DAYS=${KEEP_LOGFILE_DAYS:-90}
 EOF
-echo "[INFO] Wrote environment file $ENV_FILE"
 chmod 744 "$ENV_FILE"
+echo "[DEBUG] Wrote environment file: $ENV_FILE" && cat $ENV_FILE
 
 # Create user
 if [ $DIR_USER -gt 0 ]; then
@@ -71,8 +72,9 @@ if [ $DIR_USER -gt 0 ]; then
 fi
 
 # Mount the webdav drive 
-echo "[INFO] WEBDRIVE_URL: $WEBDRIVE_URL"
-echo "[INFO] WEBDRIVE_USER: $WEBDRIVE_USER"
+echo "[INFO] Connect to remote location as WebDAV-Webdrive"
+echo "[DEBUG] WEBDRIVE_URL: $WEBDRIVE_URL"
+echo "[DEBUG] WEBDRIVE_USER: $WEBDRIVE_USER"
 if [ -f "/var/run/mount.davfs/mnt-webdrive.pid" ]; then
   rm /var/run/mount.davfs/mnt-webdrive.pid
 fi
