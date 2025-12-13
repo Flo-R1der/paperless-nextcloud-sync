@@ -17,7 +17,7 @@ The synchronization process is intended to be real-time and seamless. Once the W
 
 <br>
 
-## Why this Project?
+## 🧠 Why this Project?
 I was looking for a seamless way to connect Paperless and Nextcloud. During my research, I tested several existing solutions, but they all had drawbacks that I found unacceptable. This project aims to meet the following **requirements**:
 
 - **Easy to configure** and ready to use within minutes.
@@ -69,7 +69,7 @@ To achieve these goals, approaches like directly mounting the export directory t
 
 <br>
 
-## Preparation
+## 📋 Preparation
 
 You may configure the [Paperless File name handling](https://docs.paperless-ngx.com/advanced_usage/#file-name-handling) first. The PDF files in Paperless are named based on their internal ID which didn't tell much when transferred to Nextcloud.
 
@@ -105,7 +105,7 @@ During the initial synchronization, depending on the number of files being trans
 
 <br>
 
-## Installation and Setup
+## 🛠️ Installation and Setup
 1. Add the container to your Paperless instance, preferably via **[Docker Compose](https://docs.docker.com/compose/)** or **[Portainer Stack](https://docs.portainer.io/user/docker/stacks/edit)**.
     - You can use and edit the following block:
         ```yaml
@@ -123,6 +123,7 @@ During the initial synchronization, depending on the number of files being trans
             devices:
               - "/dev/fuse"
         ```
+
         > [!IMPORTANT]  
         > `privileged: true` and `devices: "/dev/fuse"` are mandatory for WebDAV mounts.
 
@@ -133,8 +134,10 @@ During the initial synchronization, depending on the number of files being trans
         - **Video**: [How to create an app password in Nextcloud](https://www.youtube.com/watch?v=HQZyzlo82G4) - This is mandatory, if **Two-Factor-Authentication** is enabled for the Account you want to use! Otherwise, you can use the usual account password.
         - **Optional**: Use the environment variable `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD` if you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/).
     - **Optional**: Define mounting options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`. This can be useful if you also want the WebDAV drive mapped to a mount point on the Docker host.
-    - **Optional**: The image is build with `LC_ALL=en_US.UTF-8` and `LANG=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
-
+    - **Optional**: The image is build with `LC_ALL=en_US.UTF-8`, `LANG=en_US.UTF-8` and `LANGUAGE=en_US.UTF-8`. For the most occasions this should be suitable and you can delete that line from the config file above. Otherwise, set it to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx).
+    - **Optional**: Set the `KEEP_LOGFILE_DAYS` if the log files should be preserved for more/less than 90 days.
+    
+    You can also take a look at the [Advanced Functionalities](#🧩-advanced-functionalities)-section for custom cron capabilities.
 
 3. Restart the Paperless instance to activate the container.
 
@@ -144,14 +147,12 @@ During the initial synchronization, depending on the number of files being trans
         <details>
         <summary>Example screenshot</summary>
 
-        ![](container-logs_short-example.png)
+        ![](container-logs_example.png)
         </details>
-
-        Alternatively: compare the output to the more detailed [log example](container-logs_example.txt), if necessary.
 
 <br>
 
-## Startup
+## 🚀 Startup
 On the first run, always inspect the container logs. The logs should include the following:
 1. The container sets locales if `LC_ALL` is configured with a value other than `en_US.UTF-8`. This ensures support for non-ASCII characters in filenames.
 2. The container validates mandatory environment variables (`WEBDRIVE_URL`, `WEBDRIVE_USER`, `WEBDRIVE_PASSWORD`). If any are missing, the container exits with code 1.
@@ -174,7 +175,7 @@ On the first run, always inspect the container logs. The logs should include the
 
 <br>
 
-## Expected Results
+## ✔ Expected Results
 1. When started, the **health check** verifies WebDAV mounting and file watcher operation. If successful, the container is marked **healthy**.
     <details>
     <summary>Portainer screenshot: Container is <b>started and healthy</b></summary>
@@ -189,13 +190,26 @@ On the first run, always inspect the container logs. The logs should include the
         <details>
         <summary>Example screenshot</summary>
 
-        ![](container-logs_short-example.png)
+        ![](container-logs_example.png)
         </details>
-
-        Alternative: Refer to the detailed [log example](container-logs_example.txt), if necessary. For this example also take into account the technical details in point 4 from the Startup section.
 
 3. If you are creating Documents in Paperless, they will be transferred to your Nextcloud immediately and appear as created, deleted, or modified files in Nextcloud's Activity Feed:
 ![Nextcloud's Activity Feed](nextcloud-activity_example.png)
+
+<br>
+
+---
+
+## 🧩 Advanced Functionalities
+
+### Custom Cronjobs
+This comes with some extra configuration you must set up, otherwise cronjobs will not work at all:
+   - copy the [`cronjob`](cronjob)-file from this repository to the stack/compose-directory on your docker host (e.g. as `nc-sync_cronjobs`)
+   - edit the file and run `chown root` and `chmod 0644` on the file
+      - **Important**: you need an empty line at the end of the file!
+   - mount as volume: `- "./nc-sync_cronjobs:/etc/cron.d/cronjobs"`
+
+Do the same on scripts, if you like (but with `chmod 0744`)
 
 <br>
 
