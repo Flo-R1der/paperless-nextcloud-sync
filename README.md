@@ -8,7 +8,7 @@ This Docker image mounts a remote WebDAV source and synchronizes the data from `
 ✔ web.de smartdrive (tested in 2025-05)  
 
 
-## Why this Project?
+## 🧠 Why this Project?
 This project provides a seamless way to connect Paperless and Nextcloud, overcoming limitations found in other solutions. It fulfills the following key requirements:
 
 - **Easy and quick** configuration.
@@ -55,7 +55,7 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
 
 ---
 
-## Preparation
+## 📋 Preparation
 
 You may configure the [Paperless File name handling](https://docs.paperless-ngx.com/advanced_usage/#file-name-handling) first.
 
@@ -78,9 +78,9 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
 
 ---
 
-## Installation and Setup
+## 📥 Installation
 
-### Steps
+### 🛠️ Setup
 
 1. Add the container to your Paperless stack using Docker Compose:
    ```yaml
@@ -110,8 +110,9 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
       <summary>Click here to see the <b>optional settings:</b></summary>
 
       - Define webdrive mount options using `DIR_USER`, `DIR_GROUP`, `ACCESS_DIR`, and `ACCESS_FILE`.
-      - Set `LC_ALL` and `LANG` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
+      - Set `LC_ALL` `LANG` and `LANGUAGE` to any value from [this table](https://docs.oracle.com/cd/E23824_01/html/E26033/glset.html#glscx) if you experience filename issues with special characters.
       - Set the `KEEP_LOGFILE_DAYS` if the log files should be preserved for more/less than 90 days.
+      - Look at the [Advanced Functionalities](#🧩-advanced-functionalities)-section for custom cron capabilities.
 
       </details>
 
@@ -125,7 +126,7 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
 > [!TIP]
 > Are you struggling with this short description? <a href="https://github.com/Flo-R1der/paperless-nextcloud-sync/blob/main/documentation/README.md">Read the full documentation</a>.
 
-### Container Start
+### 🚀 Container Start
 - The WebDAV drive will be mounted.
 - The initial synchronization is started as background-job.
 - A file watcher monitors changes in real-time.
@@ -133,14 +134,29 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
 - Logs provide detailed information about the synchronization process.
 
 
-### Expected Results
+### ✔ Expected Results
 - Initial synchronization uploads existing files, that are not existing in Nextcloud, newer in Paperless or moved/renamed.
 - New files in Paperless are transferred to Nextcloud and appear in the Activity Feed:  
 ![Nextcloud's Activity Feed](documentation/nextcloud-activity_example.png)
 
 <br>
 
-## Open Topics
+---
+
+## 🧩 Advanced Functionalities
+
+### Custom Cronjobs
+This comes with some extra configuration you must set up, otherwise cronjobs will not work at all:
+   - copy the [`cronjob`](cronjob)-file from this repository to the stack/compose-directory on your docker host (e.g. as `nc-sync_cronjobs`)
+   - edit the file and run `chown root` and `chmod 0644` on the file
+      - **Important**: you need an empty line at the end of the file!
+   - mount as volume: `- "./nc-sync_cronjobs:/etc/cron.d/cronjobs"`
+
+Do the same on scripts, if you like (but with `chmod 0744`)
+
+<br>
+
+## 📌 Open Topics
 - [ ] Replace initial synchronization with a better solution. My tests with `rsync` caused file deletions during synchronization, which my script avoids but still produces error messages (see [log example](documentation/container-logs_example.txt), lines 20-24). **Please open issues only if you have a suitable solution!**
 
 <br>
