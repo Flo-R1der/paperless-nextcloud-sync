@@ -2,10 +2,21 @@
 
 # Set local Variables for full UTF-8 support
 if [[ $LC_ALL != "en_US.UTF-8" ]]; then
+  echo "[ACTION] Generating Locale: ${LC_ALL}"
   locale-gen "${LC_ALL}"
 fi
 if [[ $LANG != "en_US.UTF-8" ]]; then
   update-locale LANG="$LANG"
+fi
+
+# Set timezone if TZ variable is set
+if [[ -n "${TZ}" ]]; then
+  echo "[ACTION] setting up Time-Zone: ${TZ}"
+  ln -fs "/usr/share/zoneinfo/${TZ}" "/etc/localtime"
+  echo "symlink: /etc/localtime -> $(readlink -f /etc/localtime)"
+  dpkg-reconfigure -f noninteractive tzdata
+else
+  echo "[INFO] Time-Zone Variable '$TZ' not set. using UTC as default."
 fi
 
 # Check mandatory variables and store them to secrets file
@@ -29,13 +40,31 @@ fi
 
 echo "\"$WEBDRIVE_URL\" \"$WEBDRIVE_USER\" \"$WEBDRIVE_PASSWORD\"" > /etc/davfs2/secrets
 
+# Initialize cron.log and start cron process
+touch /var/log/cron.log
+echo "" >> /var/log/cron.log    # empty log line
+echo "===== New Container Start: $(date +%Y-%m-%d) $(date +%H:%M:%S) =====" >> /var/log/cron.log
+exec cron &
+
 # Set optional variables
-DIR_USER=${SYNC_USERID:-0}
-DIR_GROUP=${SYNC_GROUPID:-0}
-ACCESS_DIR=${SYNC_ACCESS_DIR:-755}
-ACCESS_FILE=${SYNC_ACCESS_FILE:-755}
+DIR_USER=${DIR_USER:-0}
+DIR_GROUP=${DIR_GROUP:-0}
+ACCESS_DIR=${ACCESS_DIR:-755}
+ACCESS_FILE=${ACCESS_FILE:-755}
 SOURCE_DIR="/mnt/source"
 WEBDRIVE_DIR="/mnt/webdrive"
+
+# Persist runtime environment for cron and other helpers (do NOT store secrets!)
+ENV_FILE="/etc/default/env"
+cat > "$ENV_FILE" <<EOF
+SOURCE_DIR="${SOURCE_DIR}"
+WEBDRIVE_DIR="${WEBDRIVE_DIR}"
+WEBDRIVE_USER="${WEBDRIVE_USER}"
+WEBDRIVE_URL="${WEBDRIVE_URL}"
+KEEP_LOGFILE_DAYS=${KEEP_LOGFILE_DAYS:-90}
+EOF
+chmod 744 "$ENV_FILE"
+echo "[DEBUG] Wrote environment file: $ENV_FILE" && cat $ENV_FILE
 
 # Create user
 if [ $DIR_USER -gt 0 ]; then
@@ -43,8 +72,9 @@ if [ $DIR_USER -gt 0 ]; then
 fi
 
 # Mount the webdav drive 
-echo "[INFO] WEBDRIVE_URL: $WEBDRIVE_URL"
-echo "[INFO] WEBDRIVE_USER: $WEBDRIVE_USER"
+echo "[INFO] Connect to remote location as WebDAV-Webdrive"
+echo "[DEBUG] WEBDRIVE_URL: $WEBDRIVE_URL"
+echo "[DEBUG] WEBDRIVE_USER: $WEBDRIVE_USER"
 if [ -f "/var/run/mount.davfs/mnt-webdrive.pid" ]; then
   rm /var/run/mount.davfs/mnt-webdrive.pid
 fi
@@ -78,12 +108,12 @@ echo "==========================================================================
 # start the initial synchronization as background job
 # this script prints output in container logs, when finished
 # usage sync_full.sh: $1 = source | $2 = destination | $3 = reason
-/bin/bash sync_full.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" "container-start" &
+bash sync_full.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" "container-start" &
 
 
 # setting up file watcher and actions for for high-performance instant synchronization per-event
 # supports renaming and file-move, to preserve existing files in Nextcloud (instead of delete+recreate)
-/bin/bash sync_live.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" &
+bash sync_live.sh "$SOURCE_DIR" "$WEBDRIVE_DIR" &
 
 
 wait

@@ -152,6 +152,6 @@ rm "$DELETE_LIST"
 
 # print results
 echo "----------------------------------------------------------------------------------------------------"
-echo "[INFO] RESULTS from full synchronization ($Logfile):"
+echo "[INFO] RESULTS from full synchronization ($(basename $Logfile)):"
 cat "$Logfile"
 echo "----------------------------------------------------------------------------------------------------"

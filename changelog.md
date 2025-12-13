@@ -1,3 +1,27 @@
+# [1.2.0](https://github.com/Flo-R1der/paperless-nextcloud-sync/releases/tag/1.2.0)
+
+## Added
+- Cronjob capabilities (#17)
+    - Log-Files older 90 days will be cleaned up automatically  
+    - full sync can be triggered by adjusting the [cronjob-file](cronjob)  
+  > see "🧩 Advanced Functionalities" in the readme for adjustments
+      
+
+## Improvements
+- TimeZone Variable `$TZ` is now considered (#19)
+- Health-Check now also observes if `cron` is running
+- Some small errors are fixed
+- Logging is now providing more detailed information
+
+## Documentation updates
+- Optional settings are now collapsed in README.md
+- How to adjust the Log-File retention
+- Add "Advanced Functionalities"-Section to set up custom cron jobs
+
+
+<br>
+
+---
 # [1.1.0](https://github.com/Flo-R1der/paperless-nextcloud-sync/releases/tag/1.1.0)
 
 ## Added
@@ -49,4 +73,5 @@
 
 ---
 # [v0.9.0](https://github.com/Flo-R1der/paperless-nextcloud-sync/releases/tag/v0.9.0)
-**first release / prerelease**
+**first release / pre-release**  
+Current version, used on my system. Changes for first production-release coming up on the [dev-branch](../../tree/dev)!
