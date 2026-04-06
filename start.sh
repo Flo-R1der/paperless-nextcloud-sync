@@ -1,107 +1,25 @@
 #!/bin/bash
 
-# Set local Variables for full UTF-8 support
-if [[ $LC_ALL != "en_US.UTF-8" ]]; then
-  echo "[ACTION] Generating Locale: ${LC_ALL}"
-  locale-gen "${LC_ALL}"
-fi
-if [[ $LANG != "en_US.UTF-8" ]]; then
-  update-locale LANG="$LANG"
-fi
+source /functions.sh
 
-# Set timezone if TZ variable is set
-if [[ -n "${TZ}" ]]; then
-  echo "[ACTION] setting up Time-Zone: ${TZ}"
-  ln -fs "/usr/share/zoneinfo/${TZ}" "/etc/localtime"
-  echo "symlink: /etc/localtime -> $(readlink -f /etc/localtime)"
-  dpkg-reconfigure -f noninteractive tzdata
-else
-  echo "[INFO] Time-Zone Variable '$TZ' not set. using UTC as default."
-fi
-
-# Check mandatory variables and store them to secrets file
-if [[ -z "${WEBDRIVE_USER}" ]]; then
-  echo "[ERROR] WEBDRIVE_USER is not set!"
-  exit 1
-fi
-
-if [[ -n "${WEBDRIVE_PASSWORD_FILE}" ]]; then
-    WEBDRIVE_PASSWORD=$(read "${WEBDRIVE_PASSWORD_FILE}")
-fi
-if [[ -z "${WEBDRIVE_PASSWORD}" ]]; then
-  echo "[ERROR] WEBDRIVE_PASSWORD is not set!"
-    exit 1
-fi
-
-if [[ -z "${WEBDRIVE_URL}" ]]; then
-  echo "[ERROR] WEBDRIVE_URL is not set!"
-  exit 1
-fi
-
-echo "\"$WEBDRIVE_URL\" \"$WEBDRIVE_USER\" \"$WEBDRIVE_PASSWORD\"" > /etc/davfs2/secrets
-
-# Initialize cron.log and start cron process
-touch /var/log/cron.log
-echo "" >> /var/log/cron.log    # empty log line
-echo "===== New Container Start: $(date +%Y-%m-%d) $(date +%H:%M:%S) =====" >> /var/log/cron.log
-exec cron &
-
-# Set optional variables
-DIR_USER=${DIR_USER:-0}
-DIR_GROUP=${DIR_GROUP:-0}
-ACCESS_DIR=${ACCESS_DIR:-755}
-ACCESS_FILE=${ACCESS_FILE:-755}
-SOURCE_DIR="/mnt/source"
-WEBDRIVE_DIR="/mnt/webdrive"
-
-# Persist runtime environment for cron and other helpers (do NOT store secrets!)
-ENV_FILE="/etc/default/env"
-cat > "$ENV_FILE" <<EOF
-SOURCE_DIR="${SOURCE_DIR}"
-WEBDRIVE_DIR="${WEBDRIVE_DIR}"
-WEBDRIVE_USER="${WEBDRIVE_USER}"
-WEBDRIVE_URL="${WEBDRIVE_URL}"
-KEEP_LOGFILE_DAYS=${KEEP_LOGFILE_DAYS:-90}
-EOF
-chmod 744 "$ENV_FILE"
-echo "[DEBUG] Wrote environment file: $ENV_FILE" && cat $ENV_FILE
-
-# Create user
-if [ $DIR_USER -gt 0 ]; then
-  useradd webdrive -u $DIR_USER -N -G $DIR_GROUP
-fi
-
-# Mount the webdav drive 
-echo "[INFO] Connect to remote location as WebDAV-Webdrive"
-echo "[DEBUG] WEBDRIVE_URL: $WEBDRIVE_URL"
-echo "[DEBUG] WEBDRIVE_USER: $WEBDRIVE_USER"
-if [ -f "/var/run/mount.davfs/mnt-webdrive.pid" ]; then
-  rm /var/run/mount.davfs/mnt-webdrive.pid
-fi
-mount -t davfs "$WEBDRIVE_URL" /mnt/webdrive -v \
-  -o uid="$DIR_USER",gid="$DIR_GROUP",dir_mode="$ACCESS_DIR",file_mode="$ACCESS_FILE"
-if [ $? -ne 0 ]; then
-  echo "[ERROR] Failed to mount $WEBDRIVE_URL"
-  echo "[ERROR] Please check your credentials or URL."
-  exit 1
-fi
-
-
-# Trap signals (SIGTERM, SIGINT) and pass them to child processes
-function container_exit() {
-  SIGNAL=$1
-  echo "[WARNING] Received $SIGNAL, ending processes..."
-  while $(kill -$SIGNAL $(jobs -p) 2>/dev/null); do
-    sleep 3
-  done
-  wait
-  exit 0
-}
+init_logging
+container_exit
 trap "container_exit SIGTERM" SIGTERM
 trap "container_exit SIGINT" SIGINT
 
+check_mandatory_vars
+set_optional_vars
 
-echo "[INFO] Start completed. Start initial synchronization and file watcher"
+generate_locale
+setup_timezone
+init_cron
+persist_env
+
+create_user
+mount_webdrive
+
+
+log_info "Start completed. Start initial synchronization and file watcher"
 echo "===================================================================================================="
 
 
