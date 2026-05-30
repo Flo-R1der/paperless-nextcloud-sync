@@ -102,9 +102,10 @@ You may configure the [Paperless File name handling](https://docs.paperless-ngx.
 2. Replace my placeholders and define environment variables:
    - Under `volumes:` specify the **mount-point of your document library**
    - Fill in the **`WEBDRIVE_URL`, `WEBDRIVE_USER`, and `WEBDRIVE_PASSWORD`** values.
-	   - The `WEBDRIVE_URL` must be the **WebDAV-URL of the folder**.
-           - For example if you want to synchronise your files to the `Paperless` folder, the WebDAV-URL will be `https://cloud.DOMAIN.com/remote.php/dav/files/YOUR_USERNAME/Paperless`.
-      - Use app passwords if two-factor authentication is enabled 
+	   - The `WEBDRIVE_URL` must be the **WebDAV-URL of the folder**.  
+      Example: `https://www.DOMAIN.TLD/remote.php/dav/files/YOUR_USERNAME/FOLDERNAME`
+      - Use app passwords if two-factor authentication is enabled  
+      (User Settings > Security > Devices & sessions > Create new app password)
 	   - If you want to utilize [Docker secrets](https://docs.docker.com/compose/how-tos/use-secrets/) use `WEBDRIVE_PASSWORD_FILE` instead of `WEBDRIVE_PASSWORD`.
 
       <details>
