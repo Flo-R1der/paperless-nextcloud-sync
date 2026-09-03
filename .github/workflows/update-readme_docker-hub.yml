@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v5
         with:
