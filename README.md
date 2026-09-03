@@ -64,7 +64,7 @@ This project provides a seamless way to connect Paperless and Nextcloud, overcom
    PAPERLESS_ARCHIVE_FILE_GENERATION=always
    ```
    - see the official [Documentation](https://docs.paperless-ngx.com/configuration/#PAPERLESS_ARCHIVE_FILE_GENERATION) for details
-   - see #28 if you already have documents in your paperless instance and want to check + repair, if any files are missing.
+   - see [#28](https://github.com/Flo-R1der/paperless-nextcloud-sync/issues/28) if you already have documents in your paperless instance and want to check + repair, if any files are missing.
 
 ### Nextcloud
 Requires Administrative access to Nextcloud:
